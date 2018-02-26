@@ -1,0 +1,176 @@
+ID	Genus	species	Family	Habit	Taxonomy
+1	Ocotea	veraguensis	Lauraceae	tree	strong
+2	Maclura	tinctoria	Moraceae	tree	strong
+3	Casearia	sylvestris	Flacourtiaceae	shrub	strong
+4	Acacia	collinsii	Mimosaceae	shrub	strong
+5	Cupania	guatemalensis	Sapindaceae	tree	strong
+6	Casearia	corymbosa	Flacourtiaceae	shrub	strong
+7	Calycophyllum	candidissimum	Rubiaceae	tree	strong
+8	Randia	subcordata	Rubiaceae	tree	Strong
+9	Cochlospermum	vitifolium	Cochlospermaceae	tree	strong
+10	Lonchocarpus	parviflorus	Fabaceae	tree	mixed w/ 65
+11	Casearia	arguta	Flacourtiaceae	tree	strong
+12	Trichilia	cuneata	Meliaceae	tree	strong
+13	Trichilia	hirta	Meliaceae	tree	Strong
+14	Trichilia	americana	Meliaceae	tree	strong
+15	Allophyllus	occidentalis	Sapindaceae	shrub	strong
+16	Enterolobium	cyclocarpum	Mimosaceae	tree	strong
+17	Malvaviscus	arboreus	Malvaceae	shrub	strong
+18	Cordia	panamensis	Boraginaceae	tree	strong
+19	Chomelia	spinosa	Rubiaceae	tree	strong
+21	Spondias	purpurea	Anacardiaceae	tree	strong
+22	Guazuma	ulmifolia	Sterculiaceae	tree	Strong
+23	Bursera	simaruba	Burseraceae	tree	strong
+24	Ficus	ovalis	Moraceae	tree	strong
+25	Alibertia	edulis	Rubiaceae	shrub	strong
+27	Annona	purpurea	Annonaceae	tree	strong
+28	Koanophyllon	albicaule	Asteraceae	herb	strong
+30	Licania	arborea	Chrysobalanaceae	tree	strong
+31	Trophis	racemosa	Moraceae	tree	strong
+32	Piper	amalago	Piperaceae	shrub	strong
+33	Tabebuia	ochracea	Bignoniaceae	tree	mixed w/ 74 in 70Õs
+36	Astronium	graveolens	Anacardiaceae	tree	strong
+37	Tetracera	volubilis	Dilleniaceae	vine	
+38	Annona	reticulata	Annonaceae	tree	Strong
+39	Serjania	schiedeana	Sapindaceae	vine	partial census
+41	Sapium	thelocarpum	Euphorbiaceae	tree	Strong
+42	Hemiangium	excelsum	Hippocrateaceae	shrub	strong
+43	Cordia	spp.	Boraginaceae	tree	Species 18 or 62
+44	Albizzia	adinocephala	Mimosaceae	tree	strong
+45	Pisonia	macranthocarpa	Nyctaginaceae	shrub	strong
+46	Bauhinia	ungulata	Caesalpinaceae	tree	strong
+48	Pithecellobium	saman	Mimosaceae	tree	strong
+52	Randia	karstenii	Rubiaceae	tree	strong
+53	Machaerium	biovulatum	Fabaceae	tree	strong
+56	Bombacopsis	quinatum	Bombacaceae	tree	strong
+57	Spondias	mombin	Anacardiaceae	tree	strong
+58	Luehea	candida	Tiliaceae	tree	strong
+59	Thouinidium	decandrum	Sapindaceae	tree	strong
+60	Xanthoxylum	setulosum	Rutaceae	tree	strong
+61	Aphelandra	deppeana	Acanthaceae	shrub	strong
+62	Cordia	alliodora	Boraginaceae	tree	strong
+64	Andira	inermis	Fabaceae	tree	strong
+65	Lonchocarpus	acuminatus	Fabaceae	tree	mixed w/ 10
+67	Simarouba	glauca	Simaroubaceae	tree	strong
+68	Stemmadenia	obovata	Apocynaceae	tree	strong
+71	Jacquinia	pungens	Theophrastaceae	shrub	strong
+74	Tabebuia	rosea	Bignoniaceae	tree	mixed w/ 33 in 70Õs
+75	Exostema	mexicanum	Rubiaceae	tree	strong
+76	Capparis	indica	Capparidaceae	tree	strong
+78	Manilkara	chicle	Sapotaceae	tree	strong
+79	Guettarda	macrosperma	Rubiaceae	tree	strong
+80	Cedrela	odorata	Meliaceae	tree	strong
+84	Lasianthaea	fruticosa	Asteraceae	shrub	strong
+85	Lonchocarpus	costaricensis	Fabaceae	tree	strong
+87	Muntingia	calabura	Flacourtiaceae	tree	strong
+88	Guarea	excelsa	Meliaceae	tree	strong
+89	Inga	vera	Mimosaceae	tree	strong
+90	Sapranthus	palanga	Annonaceae	tree	strong
+93	Helicteres	guazumaefolia	Sterculiaceae	shrub	strong
+96	Casearia	aculeata	Flacourtiaceae	tree	partial census
+98	Eugenia	salamensis	Myrtaceae	tree	strong
+99	Myrospermum	frutescens	Fabaceae	tree	mixed w/ 160 in 70Õs
+100	Mastichodendron	capiri	Sapotaceae	tree	strong
+101	Schoepfia	schreberi	Olacaceae	tree	mixed w/ 325 in 70Õs
+102	Senna	hayesiana	Fabaceae	shrub	strong
+107	Carica	cauliflora	Caricaceae	tree	partial census
+108	Sciadodendron	excelsum	Araliaceae	tree	strong
+109	Hirtella	racemosa	Chrysobalanaceae	shrub	strong
+110	Ateleia	herbert-smithii	Fabaceae	tree	strong
+111	Godmania	aesculifolia	Bignoniaceae	tree	strong
+112	Luehea	speciosa	Tiliaceae	tree	strong
+113	Hamelia	patens	Rubiaceae	shrub	strong
+114	Annona	muricata	Annonaceae	tree	partial census
+118	Dipterodendron	costaricensis	Sapindaceae	tree	strong
+123	Bactris	guinensis	Palmae	palm	strong
+131	Cecropia	peltata	Moraceae	tree	strong
+133	Margaritaria	nobilis	Euphorbiaceae	tree	partial census in 70Õs
+137	Apeiba	tibourbou	Tiliaceae	tree	strong
+138	Platymiscium	pleiostachyum	Fabaceae	tree	partial census
+141	Brosimum	alicastrum	Moraceae	tree	strong
+142	Bunchosia	biocellata	Malpighiaceae	tree	partial census in 70Õs
+143	Bursera	tomentosa	Burseraceae	tree	strong
+144	Byrsonima	crassifolia	Malpighiaceae	tree	strong
+149	Castilla	elastica	Moraceae	tree	strong
+154	Cornutia	grandifolia	Verbenaceae	herb	strong
+155	Crescentia	alata	Bignoniaceae	tree	strong
+158	Dalbergia	retusa	Fabaceae	tree	partial census in 70Õs
+159	Diospyros	nicaraguensis	Ebenaceae	tree	partial census in 70Õs
+160	Diphysa	robinoides	Fabaceae	tree	mixed w/ 99 in 70Õs
+161	Erythroxylon	havanense	Erythroxylaceae	shrub	strong
+163	Ficus	goldmanii	Moraceae	tree	strong
+164	Ficus	spp.	Moraceae	tree	lumped species
+165	Genipa	americana	Rubiaceae	tree	strong
+166	Gliricidia	sepium	Fabaceae	tree	Strong
+169	Sebastiana	pavoniana	Euphorbiaceae	tree	strong
+171	Hymenaea	courbaril	Caesalpinaceae	tree	strong
+173	Karwinskia	calderoni	Rhamnaceae	tree	strong
+174	Lonchocarpus	rugosus	Fabaceae	tree	partial census
+176	Lysiloma	seemannii	Mimosaceae	tree	strong
+177	Malpighia	glabra	Malpighiaceae	shrub	strong
+179	Miconia	argentea	Melastomataceae	tree	strong
+181	Paullinia	cururu	Sapindaceae	vine	partial census
+186	Piper	jaquemontianum	Piperaceae	shrub	partial census
+189	Plumeria	rubra	Apocynaceae	tree	strong
+191	Prockia	crusis	Flacourtiaceae	shrub	strong
+192	Pseudobombax	septinatum	Bombacaceae	tree	strong
+195	Rhedera	trinervis	Verbenaceae	tree	strong
+198	Roupala	montana	Proteaceae	tree	strong
+202	Solanum	hazenii	Solanaceae	herb	strong
+204	Styrax	argentea	Styracaceae	tree	partial census
+205	Swartzia	cubensis	Caesalpinaceae	tree	strong
+206	Swietenia	macrophylla	Meliaceae	tree	Strong
+207	Swietenia	humilis	Meliaceae	tree	strong
+210	Thevetia	ovata	Apocynaceae	tree	Strong
+211	Trichilia	trifolia	Meliaceae 	tree	strong
+212	Verbesina	trubacensis	Asteraceae	herb	partial census
+213	Veronia	sp.	Asteraceae	tree	partial census
+215	Ximenia	americana	Olacaceae	herb	strong
+216	Xylophragma	seemannianum	Bignoniaceae	vine	partial census
+217	Xylosoma	flexuosa	Flacourtiaceae	tree	partial census
+220	Zuelania	guidonia	Flacourtiaceae	tree	strong
+225	UNKNOWN	VINE		vine	partial census
+231	Tabebuia	spp.	Bignoniaceae	tree	Species 33 or 74
+233	Luehea	spp.	Tiliaceae	tree	Species 58 or 112
+239	UNKNOWN			varies	lumped species
+258	Lonchocarpus	spp.	Fabaceae	tree	Species 10 or 65
+260	Cestrum	sp.	Solanaceae	tree	strong
+264	Cydista	diversifolia	Bignoniaceae	vine	partial census
+316	Capparis	frondosa	Capparidaceae	tree	partial census in 70Õs
+318	Cordia	curassavica	Boraginaceae	tree	partial census
+320	Davilla	kunthii	Dilleniaceae	vine	
+325	Agonandra	macrocarpa	Opiliaceae	tree	mixed w/101 in 70Õs
+327	Acacia	farnesiana	Mimosaceae	shrub	strong
+330	Ardisia	revoluta	Myrsinaceae	shrub	strong
+420	Senna	atromaria	Caesalpinaceae	tree	strong
+701	Phyllanthus	acuminatus	Euphorbiaceae	herb	partial census
+719	Sterculia	apetala	Sterculiaceae	tree	strong
+720	Zizyphus	guatemalensis	Rhamnaceae	tree	strong
+724	Macfadyena	unguis-cati	Bignoniaceae	vine	partial census
+726	Cydista	aequinoctialis	Bignoniaceae	vine	partial census
+727	Arrabidaea	patellifera	Bignoniaceae	vine	partial census
+730	Combretum	farinosum	Combretaceae	shrub	strong
+747	Piper	tuberculatum	Piperaceae	shrub	partial census
+749	Bernardia	nicaraguensis	Euphorbiaceae	shrub	partial census
+812	Trema	micranthia	Ulmaceae	tree	strong
+817	Xylophragma	costaricensis	Bignoniaceae	vine	partial census
+915	Casearia	spp.	Flacourtiaceae	shrub	lumped species
+923	Acrocomia	vinifera	Palmae	palm	strong
+933	Machaerium	kegelii	Fabaceae	vine	partial census
+934	Krugiodendron	ferreum	Rhamnaceae	tree	strong
+935	Chrysophyllum	brenesii	Sapotaceae	tree	strong
+936	Casearia	praecox	Flacourtiaceae	shrub	strong
+937	Maytenis	segoviarum	Celastraceae	shrub	strong
+938	Coursetia	elliptica	Fabaceae	shrub	strong
+939	Couterea	hexandra	Rubiaceae	tree	strong
+945	Vernonia	triflosculosa	Asteraceae	herb	strong
+946	Adelia	triloba	Euphorbiaceae	tree	strong
+965	Critonia	sexangulare	Asteraceae	tree	strong
+967	Lonchocarpus	oliganthus	Fabaceae	tree	strong
+969	Pachyptera	hymenaea	Bignoniaceae	vine	partial census
+975	Tabebuia	impetiginosa	Bignoniaceae	tree	Strong
+981	Pterocarpus	rohrii	Fabaceae	tree	strong
+983	Spondias	radlkoferi	Anacardiaceae	tree	strong
+985	Croton	morifolius	Euphorbiaceae	shrub	strong
+987	Rourea	glabra	Connaraceae	shrub	strong
+989	Acacia	tenuifolia	Mimosaceae	vine	partial census

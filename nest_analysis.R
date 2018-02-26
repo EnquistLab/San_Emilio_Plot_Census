@@ -9,6 +9,10 @@ corners$x <- as.numeric(unlist(lapply(ll, '[[', 1)))
 corners$y <- as.numeric(unlist(lapply(ll, '[[', 2)))
 corners$y[9] = 39
 
+species_key <- read.csv("Species_number_translation.txt", sep="\t")
+traits <- read.csv("traits.csv", header = TRUE)
+traits <- traits[c(1, 2, 3, 16, 17, 18, 19)]
+
 #Read and clean ant data
 ant_data <- read.csv("antAll.csv")
 cc <- colnames(ant_data)
@@ -46,41 +50,47 @@ rand_plots <- data.frame(ID=numeric(nrow(areas)*4), X=numeric(nrow(areas)*4), Y=
 for(i in seq(1, nrow(areas)))
 {
   dim = sqrt(areas[i,]$V1)/2
-  print(paste("Plot area: ", areas[i,]$V1))
-  print(paste("Plot dimension: ", dim))
+  #print(paste("Plot area: ", areas[i,]$V1))
+  #print(paste("Plot dimension: ", dim))
   rand_plots[((i-1)*4)+1,] = (c(areas[i,]$ID, areas[i,]$X+dim, areas[i,]$Y+dim))
   rand_plots[((i-1)*4)+2,] = (c(areas[i,]$ID, areas[i,]$X+dim, areas[i,]$Y-dim))
   rand_plots[((i-1)*4)+3,] = (c(areas[i,]$ID, areas[i,]$X-dim, areas[i,]$Y+dim))
   rand_plots[((i-1)*4)+4,] = (c(areas[i,]$ID, areas[i,]$X-dim, areas[i,]$Y-dim))
 }
 
+get_stats <- function(hulls)
+{
+  hull_stats <- data.frame(ID=hulls$ID, ABUNDANCE=numeric(nrow(hulls)), RICHNESS=numeric(nrow(hulls)), 
+                            SLA=numeric(nrow(hulls)), LEAF_AREA=numeric(nrow(hulls))) 
+  hulls <- hulls[,-1]
+  colnames(hulls) <- sub("V",'',colnames(hulls))
+  for(i in seq(1, nrow(hulls))) 
+  { 
+    present = which(hulls[i,] == 1)
+    amt = length(present)
+    ids = tree_data96[present,]$SPECIES_ID
+    rich <- length(unique(ids))
+    spp <- species_key[ids,]$species
+    spp <- spp[!is.na(spp)]
+    trows <- match(spp, traits$Species)
+    trows <- trows[!is.na(trows)]
+    sla <- traits[trows,]$SLA
+    area <- traits[trows,]$area
+    hull_stats[i,2] = amt
+    hull_stats[i,3] = rich
+    hull_stats[i,4] = mean(sla, na.rm=TRUE)
+    hull_stats[i,5] = mean(area, na.rm=TRUE)
+  }
+  print(hull_stats)
+  return(hull_stats)
+}
 #Do collision testing on random plots
 rhulls <- ddply(rand_plots, .(ID), function(x) inhull(test_points, data.frame(x$X, x$Y)))
-rhull_stats <- data.frame(ID=rhulls$ID, ABUNDANCE=numeric(nrow(rhulls)), 
-                            RICHNESS=numeric(nrow(rhulls)))
-rhulls <- rhulls[,-1]
-colnames(rhulls) <- sub("V",'',colnames(rhulls))
-
-#Check abundances inside random plots
-for(i in seq(1, nrow(rhull_stats))) { present = which(rhulls[i,] == 1)
-                                      amt = length(present)
-                                      rich <- length(unique(tree_data96[present,]$SPECIES_ID))
-                                      rhull_stats[i,2] = amt
-                                      rhull_stats[i,3] = rich}
+rhull_stats <- get_stats(rhulls)
 
 #Do collision testing on nest plots
 chulls <- ddply(ant_data[hull_data,], .(ID), function(x) inhull(test_points, data.frame(x$vX, x$vY)))
-chull_stats <- data.frame(ID=chulls$ID, ABUNDANCE=numeric(nrow(chulls)),
-                          RICHNESS=numeric(nrow(rhulls)))
-chulls <- chulls[,-1]
-colnames(chulls) <- sub("V",'',colnames(chulls))
-
-#Check abundances inside nest plots
-for(i in seq(1, nrow(chull_stats))) {   present = which(chulls[i,] == 1)
-                                        amt = length(present) 
-                                        rich <- length(unique(tree_data96[present,]$SPECIES_ID))
-                                        chull_stats[i,2] = amt
-                                        chull_stats[i,3] = rich}
+chull_stats <- get_stats(chulls)
 
 #Combine random and nest results for plotting
 rhull_stats$PLOT <- rep("R", nrow(rhull_stats))
@@ -90,6 +100,8 @@ hull_stats <- rbind(rhull_stats, chull_stats)
 #plot abundance, richness, traits
 ap <- ggplot(data=hull_stats, aes(PLOT, ABUNDANCE)) + geom_boxplot()
 rp <- ggplot(data=hull_stats, aes(PLOT, RICHNESS)) + geom_boxplot()
+sp <- ggplot(data=hull_stats, aes(PLOT, SLA)) + geom_boxplot()
+arp <- ggplot(data=hull_stats, aes(PLOT, LEAF_AREA)) + geom_boxplot()
 #TODO:
 #Plot traits inside hulls
 
@@ -98,3 +110,16 @@ nest_plot <- ggplot(ant_data[hull_data,], aes(group=ID, color=ID, x=vX, y=vY)) +
     geom_point(data=corners, aes(x=x, y=y), size=2, shape = 5) + 
       geom_point(data=tree_data96, aes( x=(X+(Xq/20)),y=(Y+(Yq/20)) ), size=0.05, alpha = 0.25, inherit.aes=FALSE) + 
         geom_point(data=rand_plots, aes(x=X, y=Y))
+
+get_species_list <- function(chulls)
+{
+  for(i in seq(1, nrow(chulls))) { 
+    present = which(chulls[i,] == 1)
+    ids = tree_data96[present,]$SPECIES_ID
+    id = chulls[i,]$ID
+    spp <- species_key[ids,]$species
+    spp <- spp[!is.na(spp)]
+    ss <- paste(id, spp, sep = ",")
+    write(ss, append=TRUE)
+  }
+}
