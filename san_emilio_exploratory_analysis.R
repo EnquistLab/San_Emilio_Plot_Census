@@ -1,14 +1,19 @@
+#This script will become an analysis for Chapter 3 of the thesis, and/or the ForestGEO publication.
+#Needs to make use of data pulled out of the census_validation.R script
+
 library(ggplot2)
 
 #Basic geometry of San Emilio - stated as 16ha plot, 160,000m^2 
 #Reality - A set of 20x20m plots, from 0 - 240 and 140 - 780,
 #so the dimensions are 12x32 = 384 * 400 = 153,600m^2
+stakes <- read.csv('data/topo2.csv', header = FALSE)
+#ggplot(stakes, aes(x=V2, y=V3)) + geom_point()
 
 #Precise stem information is in meters between the bounds: 
 #0 < X < 240, 140 < Y < 780
 stems_1976 <- read.csv("data/xtot1976.txt", header=FALSE, sep="\t")
 
-#There is an extra block of stems closer to the road
+#There is an extra block of stems closer to the road after enquist showed up
 #Approx: 0 < X < 25, 140 < Y < 350
 stems_1996 <- read.csv("data/xxtot1996.txt", header=FALSE, sep="\t")
 a_stems_1996 <- read.csv("data/SanEmilio_1996.txt", header=FALSE, sep="\t")
@@ -31,7 +36,7 @@ colnames(stems_1996) <- census_names_96
 colnames(a_stems_1996) <- a_census_names_96
 colnames(stems_2006) <- census_names_06
 
-stems_1996 <- a_stems_1996
+#stems_1996 <- a_stems_1996
 
 stems_1976$DBH <- as.numeric(stems_1976$DBH)
 stems_1996$DBH <- as.numeric(stems_1996$DBH)/10 #centimeters multiplied by 10? This data is a mess
