@@ -4,12 +4,14 @@
 
 library(ggplot2)
 library(dplyr)
+library(readr)
 
 source('sheets_integration.R')
 
 species_table <- read.csv("data/Species_number_translation.csv")
 colnames(species_table)[1] <- "SPP"
 species_key <- read.csv("data/species_code_key.csv")
+traits <- read.csv("data/san_emilio_trait_means.csv")
 
 #Collect all data from all the censuses together and standardize them:
 stems_1976 <- read.csv("data/xtot1976.txt", header=FALSE, sep="\t", stringsAsFactors=FALSE)
@@ -27,6 +29,7 @@ colnames(stems_2006) <- census_names_06
 
 stems_1976$DBH <- as.numeric(stems_1976$DBH)
 stems_1996$DBH <- as.numeric(stems_1996$DBH)
+stems_1996$DBH_76 <- as.numeric(stems_1996$DBH_76)
 
 munge_digits <- function(x){
     if(!is.na(x))
@@ -37,6 +40,21 @@ munge_digits <- function(x){
         else
             return(x)
     }
+}
+
+munge_plots <- function(x)
+{
+    if(!is.na(x))
+    {
+        len = nchar(x)
+        if(len == 1)
+            return(paste("000",x,sep=""))
+        else if(len == 2)
+            return(paste("00",x,sep=""))
+        else if(len == 3)
+            return(paste("0",x,sep=""))
+    }
+    return(x)
 }
 
 stems_1976$PX <- floor(stems_1976$X / 20)
@@ -58,6 +76,7 @@ stems_1996$PLOT <- as.factor(unlist(unname(plots_96)))
 stems_1976 <- stems_1976[which(stems_1976$PX > 0),]
 stems_1996 <- stems_1996[which(stems_1996$PX > 0),]
 
+print("Process 2019 census")
 #Standardize plot information (coordinates, offsets, factored plot IDs, etc)
 plots <- as.character(stems_2019$PLOT)
 plots <- sapply(plots, FUN=munge_plots)
@@ -67,27 +86,45 @@ plots_s <- substring(plots, 1, 2)
 plots_e <- substring(plots, 3, 4)
 stems_2019$PX <- as.integer(plots_s)
 stems_2019$PY <- as.integer(plots_e)
-stems_2019$CX <- (stems_2019$PX * 20) + 10
-stems_2019$CY <- ((stems_2019$PY - 7) * 20) + 10
-
-main_stems <- which(is.na(stems_2019$MAIN))
-branch_stems <- which(!is.na(stems_2019$MAIN))
-
 stems_2019$PLOT <- as.factor(stems_2019$PLOT)
-stems_2019$NOTES <- as.character(stems_2019$NOTES)
 
-#Copy over species codes and notes from main stems to branches
-for (x in seq(0, length(branch_stems)))
-{
-	ind <- branch_stems[x]
-	main_ind <- stems_2019[ind,]$MAIN
-	stems_2019[ind,]$SPP <- stems_2019[main_ind,]$SPP
-	stems_2019[ind,]$NOTES <- stems_2019[main_ind,]$NOTES
-	stems_2019[ind,]$DEG <- stems_2019[main_ind,]$DEG
-	stems_2019[ind,]$DIST <- stems_2019[main_ind,]$DIST
-}
+print(paste("Flagged invalid DBH data for IDs: ", which(stems_2019$DBH > 200)))
+
 #Parse the Notes column and store the comma-separated field as a list
+stems_2019$NOTES <- as.character(stems_2019$NOTES)
 notes_list <- strsplit(stems_2019$NOTES, c(','))
+
+print("Process branch stems")
+branch_stems <- which(!is.na(stems_2019$MAIN))
+copy_branch_information <- function(branch)
+{
+    main_ind = stems_2019[branch,]$MAIN
+    plot = stems_2019[branch,]$PLOT
+    main = which(stems_2019$ID == main_ind & stems_2019$PLOT == plot)
+    if(length(main) == 0)
+        print(paste("BranchID error:", branch))
+    else if(length(main) == 1)
+    {
+	stems_2019[branch,]$SPP = stems_2019[main,]$SPP
+	stems_2019[branch,]$DEG = stems_2019[main,]$DEG
+	stems_2019[branch,]$DIST = stems_2019[main,]$DIST
+    }    
+    else
+        print(paste("BranchID uniqueness error:", branch))
+}
+sapply(branch_stems, FUN=copy_branch_information)
+main_stems <- which(is.na(stems_2019$MAIN))
+copy_main_information <- function(main)
+{
+    branches = which(stems_2019$MAIN == stems_2019[main,]$ID & stems_2019$PLOT == stems_2019[main,]$PLOT)
+    if(length(branches) > 0)
+    {
+        #print(paste("Copying main stem:", main))
+        fields <- c("SPP", "DEG", "DIST")
+        stems_2019[branches,fields] <<- stems_2019[main,fields]
+    }
+}
+#sapply(main_stems, copy_main_information)
 
 #Merge species information with codes in the raw data
 #Use a left-join to ensure rows without species IDs are preserved
@@ -99,6 +136,9 @@ stems_1996 <- left_join(stems_1996, species_table)
 #Compute x/y offsets from polar coordinates using transponder data
 #These offsets are relative to the putative 'center' of each plot.
 #Rotate 90 degrees to account for the northern bearing when using polar coordinates, then convert to radians
+stems_2019$DEG <- as.numeric(stems_2019$DEG)
+stems_2019$DIST <- as.numeric(stems_2019$DIST)
+
 rads = (pi*(stems_2019$DEG+90)/180)
 stems_2019$OX <- stems_2019$DIST*cos(rads)
 stems_2019$OY <- stems_2019$DIST*sin(rads)
@@ -106,32 +146,75 @@ stems_2019$OY <- stems_2019$DIST*sin(rads)
 #Reflect across the x axis for unknown reasons
 stems_2019$OY <- -stems_2019$OY
 
-#Make global X-Y positions assuming stems are centered on each plot (error emerges from transponder placement).
-stems_2019$X <- stems_2019$CX + stems_2019$OX
-stems_2019$Y <- stems_2019$CY + stems_2019$OY
+#Extract rebar positions from notes list
+grep_boundary <- function(x, pat)
+{
+    ind <- grep(pat, x)
+    deg <- parse_number(x[ind])
+    dist <- x[ind+1]
+    return(c(deg, dist))
+}
+
+sw <- grepl("SW:", notes_list)
+bar_list <- lapply(notes_list[sw], FUN=grep_boundary, pat="SW")
+bar_frame_sw <- data.frame(matrix(unlist(bar_list), nrow=length(bar_list), byrow=TRUE))
+bar_frame_sw$PLOT <- stems_2019[sw,]$PLOT
+bar_frame_sw$CORNER <- rep("SW", length(bar_list))
+
+nw <- grepl("NW:", notes_list)
+bar_list <- lapply(notes_list[nw], FUN=grep_boundary, pat="NW")
+bar_frame_nw <- data.frame(matrix(unlist(bar_list), nrow=length(bar_list), byrow=TRUE))
+bar_frame_nw$PLOT <- stems_2019[nw,]$PLOT
+bar_frame_nw$CORNER <- rep("NW", length(bar_list))
+
+ne <- grepl("NE:", notes_list)
+bar_list <- lapply(notes_list[ne], FUN=grep_boundary, pat="NE")
+bar_frame_ne <- data.frame(matrix(unlist(bar_list), nrow=length(bar_list), byrow=TRUE))
+bar_frame_ne$PLOT <- stems_2019[ne,]$PLOT
+bar_frame_ne$CORNER <- rep("NE", length(bar_list))
+
+se <- grepl("SE:", notes_list)
+bar_list <- lapply(notes_list[se], FUN=grep_boundary, pat="SE")
+bar_frame_se <- data.frame(matrix(unlist(bar_list), nrow=length(bar_list), byrow=TRUE))
+bar_frame_se$PLOT <- stems_2019[se,]$PLOT
+bar_frame_se$CORNER <- rep("SE", length(bar_list))
+
+bar_frame <- rbind(bar_frame_sw, bar_frame_nw)
+bar_frame <- rbind(bar_frame_ne, bar_frame)
+bar_frame <- rbind(bar_frame, bar_frame_se)
+colnames(bar_frame) <- c("DEG", "DIST", "PLOT", "CORNER")
+
+print(paste("Flagged invalid position data for row: ", which(stems_2019$DEG >= 360 | stems_2019$DIST > 30)))
+
+bar_frame$DEG <- as.numeric(as.character(bar_frame$DEG))
+bar_frame$DIST <- as.numeric(as.character(bar_frame$DIST))
+rads = (pi*(bar_frame$DEG+90)/180)
+bar_frame$BX <- bar_frame$DIST*cos(rads)
+bar_frame$BY <- bar_frame$DIST*sin(rads)
+stems_2019$CX <- rep(10, nrow(stems_2019))
+stems_2019$CY <- rep(10, nrow(stems_2019))
+
+#Compute plot centers based on offsets from the rebar positions
+plots <- unique(bar_frame$PLOT)
+find_and_set_plot_center <- function(x)
+{
+    bars <- which(bar_frame$PLOT == x)
+    stems <- which(stems_2019$PLOT == x)
+    stems_2019[stems,]$CX <<- rep(mean(bar_frame[bars,]$BX)+10, length(stems))
+    stems_2019[stems,]$CY <<- rep(mean(bar_frame[bars,]$BY)+10, length(stems))
+}
+centers <- sapply(plots, find_and_set_plot_center)
+
+#Make global X-Y positions using measurements of plot boundaries
+stems_2019$X <- (stems_2019$PX * 20) + stems_2019$CX + stems_2019$OX
+stems_2019$Y <- ((stems_2019$PY - 7) * 20) + stems_2019$CY + stems_2019$OY
 
 #Conditions for flagging potential errors in data
 validation <- is.na(stems_2019$DBH) | 
 ((is.na(stems_2019$SPP) | stems_2019$SPP == "") & is.na(stems_2019$MAIN))
-stems_2019$INVALID <- validation
+print(paste("Flagged missing fields for IDs: ", which(validation)))
 
 #Ready for stem mapping after this
-#Begin matching stems across census years
-#'76 -> '96
-matched_76_96 <- match_76_96()
-#The result of this vector should be all 0's, but many are not - indicating the matching isn't perfect
-difference <- as.numeric(matched_76_96$DBH_76) - stems_1976[matched_76_96$MATCH,]$DBH
-
-
-#Create a per-plot report on missing species ID, DBH measurements, pole pruners/Nails
-generate_plot_report <- function(stems, plot_id)
-{
-	plot <- which(stems$PLOT == plot_id)
-	missing_dbh <- which(is.na(stems[plot,]$DBH))
-	missing_species <- which(stems_2019$SPP == "")
-	nails <- which(!is.na(stems[plot,]$NAIL))
-	macrosystems <- which(!is.na(stems[plot,]$MS))
-}
 
 #Count the number of lianas using ad hoc morphospecies, provisional names, and the notes column.
 generate_liana_report <- function()
@@ -146,63 +229,48 @@ generate_liana_report <- function()
 
 }
 
-#Generates a list of missing DBHs, SPPs, etc.
-generate_validation_report <- function(stems)
-{
-	plots <- unique(stems$PLOT)
-	for(plot in plots)
-	{
-
-	}
-}
-
 #Takes raw census data with MS column and raw macrosystems data to swap ids when tag replacement is done
-swap_macrosystems_ids <- function(stems, ms)
+#Add species info from our list of species
+clean_macrosystems_data <- function(stems, species, ms)
 {
+    #Add taxonomic information
+    col_num <- length(colnames(ms))
+    gg <- left_join(ms, species, by="SPP")
+    gg1 <- gg[which(!is.na(gg$GENUS) | gg$SPP == ""),]    
+    nas <- which(gg1$SPP == "")    
+    gg1[nas,]$GENUS <- as.character(gg1[nas,]$GENUS)
+    gg1[nas,]$GENUS <- "" 
+    gg1$species_binomial <- paste(gg1$GENUS, gg1$SPECIES)
+        
+    print(nrow(gg1))
+    col_new_num <- length(colnames(gg1))
+
+    not <- which(is.na(gg$GENUS) & gg$SPP != "")
+    gg2 <- left_join(ms[not, c(seq(1, col_num))], species, by=c("SPP" = "ALIAS"))
+    #nas <- which(is.na(gg2$GENUS))    
+    #gg2[nas,]$GENUS <- ""
+    #gg2[nas,]$SPECIES <- ""    
+    gg2$species_binomial <- paste(gg2$GENUS, gg2$SPECIES)
+    print(nrow(gg2))
+    ms <- rbind(gg1[,c(seq(1, col_num), col_new_num)], gg2[,c(seq(1, col_num), col_new_num)])
+    print(nrow(ms))
+    #Swap old tag numbers
     macrosystems <- which(!is.na(stems$MS))
+    
     ms_ids <- stems[macrosystems,]$MS
     new_ids <- stems[macrosystems,]$ID
     replaced <- match(ms_ids, ms$enq)
+    
     nas <- which(!is.na(replaced))
     replaced_na <- replaced[nas]
     new_ids_na <- new_ids[nas]
     ms_ids_na <- ms_ids[nas]
     ms[replaced_na,]$enq <- new_ids_na
-    ms[replaced_na,]$y2_notes <- paste("Old tag#: ", ms_ids_na)
-    return(macrosystems)
-    #write.csv(ms, file="macrosystems_y2_replaced.csv", na="")
-
+    #ms[replaced_na,]$y2_notes <- paste("Old tag#:", as.character(ms_ids_na))
+    
+    return(ms)
+    #write.csv(ms, file="macrosystems_y2_cleaned.csv", na="")
 }
-
-match_76_96 <- function()
-{   
-    stems_1996_ids <- stems_1996[which(stems_1996$ID != 0),]
-    stems_1996_ids$MATCH <- rep(-1, nrow(stems_1996_ids))
-    #match_76 = stems_1976[which(as.character(stems_1976$PLOT) == as.character(stems_1996_ids[0,]$PLOT) & stems_1976$DBH_76 == stems_1996_ids[0,]$DBH & stems_1976$SPP == stems_1996_ids[0,]$SPP),]
-    for(x in seq(1, nrow(stems_1996_ids)))
-    {
-        stem_match = which(as.character(stems_1976$PLOT) == as.character(stems_1996_ids[x,]$PLOT) & stems_1976$ID == stems_1996_ids[x,]$ID)# & stems_1976$DBH_76 == stems_1996_ids[x,]$DBH)# & stems_1976$SPP == stems_1996_ids[x,]$SPP)
-        if(length(stem_match > 0))
-        {
-            #A fair amount of ambiguity between plot and ID matching
-            if(length(stem_match) > 1)
-            {
-                print(stem_match)
-                stem_match = stem_match[1]
-                print(stem_match)
-            }
-            stems_1996_ids[x,]$MATCH = stem_match
-        }       
-        #match_76 = rbind(match_76, stems_1976[stem_match,])
-    }
-    return(stems_1996_ids[which(stems_1996_ids$MATCH > 0),])
-}
-
-#How many tags do plots take?
-#Average: 223.75
-#plot_distribution <- count(stems_2019, PLOT)
-#ggplot(plot_distribution, aes(x=PLOT, y=n, fill=PLOT)) + geom_bar(stat="identity")
-#ggsave("plot_distribution.png")
 
 #stems_2006 <- read.csv("data/xtot2006.raw.data.csv")
 #plot_007 <- which(stems_2006$col == 0 & stems_2006$row == 7)
